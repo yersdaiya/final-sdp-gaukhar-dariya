@@ -54,12 +54,25 @@ public class SchoolFacade {
         return decorated;
     }
 
+
     public void assignGrade(String teacherId, String studentId, String subject, double score, double weight) {
         Account teacher = db.getAccount(teacherId);
-        if (!teacher.getPermissions().contains("ASSIGN_GRADES"))
+
+        if (!teacher.getPermissions().contains("ASSIGN_GRADES")) {
             throw new SecurityException(teacher.getName() + " cannot assign grades");
+        }
+
+        if (score < 0 || score > 100) {
+            throw new IllegalArgumentException("Grade must be between 0 and 100");
+        }
+
+        if (weight <= 0) {
+            throw new IllegalArgumentException("Weight must be greater than 0");
+        }
+
         gradeBook.addGrade(studentId, new Grade(subject, score, weight));
     }
+
 
     public ReportCard generateReport(String studentId, String term, String comment) {
         return new ReportCardBuilder()
